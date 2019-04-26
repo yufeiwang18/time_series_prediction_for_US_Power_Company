@@ -29,16 +29,17 @@ load_kw_y.test=window(load_kw_y,start=test.start)
 
 naive_M1=snaive(load_kw_y.train,h=length(load_kw_y.test),level=95)
 
-#autoplot(naive_M1) + autolayer(naive_M1$fitted,series="Fitted\nvalues")+
- # autolayer(load_kw_y.test,series="Testing\nset")   
+autoplot(naive_M1) + autolayer(naive_M1$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")   
 
 accu=data.frame(accuracy(na.omit(naive_M1),load_kw_y.test))
 
+accu
 # MAPE Training 17.73 Test 16.38
 
 
 # create mape dataframe
-mape_result=data.frame("naive_model"=accu$MAPE,row.names = c("test","train"))
+mape_result=data.frame("naive_model"=accu$MAPE,row.names = c("train","test"))
 mape_result
 
 
@@ -77,8 +78,8 @@ mape_result$arima_model=accu$MAPE
 mape_result
 # MAPE Training 2.93 Test 27.31
 
-#autoplot(M4F) + autolayer(M4$fitted,series="Fitted\nvalues")+
-#  autolayer(load_kw_y.test,series="Testing\nset")
+autoplot(arima_prediction) + autolayer(arima_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 
 ######################## TBATS Model ######################## Exponential Smoothing State Space Model With Box-Cox Transformation, ARMA Errors, Trend And Seasonal Components
 
@@ -89,6 +90,8 @@ tba.model=tbats(load_kw_y.train,use.box.cox=TRUE,use.trend = TRUE,
 tba_prediction=forecast(tba.model,h=ntest)
 accu=data.frame(accuracy(tba_prediction,load_kw_y.test))
 
+autoplot(arima_prediction) + autolayer(arima_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 # add mape result
 mape_result$tbats_model=accu$MAPE
 
@@ -107,6 +110,9 @@ accu=data.frame(accuracy(stlm_prediction,load_kw_y.test))
 
 # add mape result
 mape_result$stl_model=accu$MAPE
+
+autoplot(stlm_prediction) + autolayer(stlm_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 
 # MAPE Training 0.986172 Test 16.324152
 
@@ -207,64 +213,117 @@ accu$MAPE
 mape_result$regression_model=accu$MAPE
 # MAPE 20.70072 22.42678
 
+autoplot(fcast) + autolayer(fcast$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
+
 ######################## Decompose Model+stl ######################## 
 
 stlf.model=stlf(load_kw_y.train, method='arima',lambda="auto",biasadj=FALSE)
 stlf_prediction=forecast(stlf.model,h=ntest)
 accu=data.frame(accuracy(stlf_prediction,load_kw_y.test))
-
 # add mape result
 mape_result$decom_arima_model=accu$MAPE
-
 # method="arima" MAPE Training 1.206612 Test 15.193803                        BEST BEST BEST
+autoplot(stlf_prediction) + autolayer(stlf_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
+
+
 
 stlf.model=stlf(load_kw_y.train, method='naive',lambda="auto",biasadj=FALSE)
 stlf_prediction=forecast(stlf.model,h=ntest)
 accu=data.frame(accuracy(stlf_prediction,load_kw_y.test))
-
 # add mape result
 mape_result$decom_naive_model=accu$MAPE
-
 # method="naive" MAPE Training 2.151739 Test 15.202198
+autoplot(stlf_prediction) + autolayer(stlf_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
+
+
 
 stlf.model=stlf(load_kw_y.train, method='rwdrift',lambda="auto",biasadj=FALSE)
 stlf_prediction=forecast(stlf.model,h=ntest)
 accu=data.frame(accuracy(stlf_prediction,load_kw_y.test))
-
 # add mape result
 mape_result$decom_rwdrift_model=accu$MAPE
-
 # method="rwdrift" MAPE Training 2.151706 Test 15.518230
+autoplot(stlf_prediction) + autolayer(stlf_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 
 ######################## HoltWinters Model ########################
-## Seasonal Holt-Winters
+## Holt-Winters with additive seasonality
 HW.model=HoltWinters(load_kw_y.train, seasonal = c("additive"))#"additive", 
 HW_prediction=forecast(HW.model,h=ntest)
 accu=data.frame(accuracy(HW_prediction,load_kw_y.test))
-
 # add mape result
 mape_result$HoltWinters_additive_model=accu$MAPE
 # seasonal = c("additive") MAPE Training 2.501263 Test 18.033887
+autoplot(HW_prediction) + autolayer(HW_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 
+## Holt-Winters with multiplicative seasonality
 HW.model=HoltWinters(load_kw_y.train, seasonal = c("multiplicative"))
 HW_prediction=forecast(HW.model,h=ntest)
 accu=data.frame(accuracy(HW_prediction,load_kw_y.test))
-
 # add mape result
 mape_result$HoltWinters_multiplicative_model=accu$MAPE
 # seasonal = c("multiplicative") MAPE Training 2.344205 Test 18.287523
+autoplot(HW_prediction) + autolayer(HW_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 
 
-## Exponential Smoothing
+## Holt-Winters with Exponential Smoothing
 HW_expo.model <- HoltWinters(load_kw_y.train, gamma = FALSE, beta = FALSE)
 HW_expo_prediction=forecast(HW_expo.model,h=ntest)
 accu=data.frame(accuracy(HW_expo_prediction,load_kw_y.test))
-
 # add mape result
 mape_result$HoltWinters_expo_model=accu$MAPE
 #  MAPE Training 7.078471 Test 29.019098
+autoplot(HW_expo_prediction) + autolayer(HW_expo_prediction$fitted,series="Fitted values")+
+  autolayer(load_kw_y.test,series="Testing set")
 
-print(mape_result)
+######################## ETS Model ######################## does not work
+ets.model=ets(load_kw_y.train,damped = T,lambda = "auto")
+summary(ets)
+
+ets_f=forecast(ets.model,h=ntest,level=95)
+
+autoplot(ets_f)
+
+######################## ARIMA with Fourier terms #########################
+arima_model=auto.arima(load_kw_y.train,seasonal=TRUE,
+                       xreg=fourier(load_kw_y.train,K=c(5,5,5,5)))
+
+arima_f=forecast(arima_model,xreg=fourier(load_kw_y.train,K=c(5,5,5,5),
+                                          h=ntest))
+
+accu=data.frame(accuracy(arima_f,load_kw_y.test))
+accu$MAPE
+# add mape result
+mape_result$arima_fourier=accu$MAPE
+
+######################## Theta Model #########################
+theta_model=thetaf(load_kw_y.train,h=ntest,level=95)
+theta_f=forecast(theta_model,h=ntest)
+accu=data.frame(accuracy(theta_f,load_kw_y.test))
+accu$MAPE
+# add mape result
+mape_result$theta=accu$MAPE
+
+autoplot(theta_f) + autolayer(theta_f$fitted,series="Fitted values")+
+  autolayer(dph_y.test,series="Testing set") 
+mape_result
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # decom_arima_model is the best
@@ -284,25 +343,5 @@ write.xlsx(predict_2005, "Load Prediction 2005.xlsx",sheetName="Prediction")
 
 
 
-# get DailyPeakHour and save to "DailyPeakHour.csv"
-#Load_kW_regression
-temp=Load_kW_regression%>% 
-  group_by(Date)%>%
-  summarise(
-    highest_power=max(Load_kW)
-  )
-test=merge(temp, Load_kW_regression, by.x=c("Date", "highest_power"), 
-           by.y=c("Date", "Load_kW"),
-           all.x=TRUE)
-lengths(unique(test["Date"]))==lengths(unique(temp["Date"]))
-DailyPeakHour=test
 
-DailyPeakHour=data.frame(DailyPeakHour)
-DailyPeakHour$trend=1:length(DailyPeakHour$Date)
-
-drops=c("T","Time","DayofWeek..1..Sunday..to.7..Saturday..","Datetime")
-
-tt=DailyPeakHour[ , !(names(DailyPeakHour) %in% drops)]
-
-write.xlsx(tt, file = "DailyPeakHour.xlsx")
 
