@@ -366,3 +366,17 @@ predict_2006 <- read.xlsx("Competition data.xlsx", sheet="2006")
 predict_2006$DailyPeakHour=theta_prediction$mean
 
 write.xlsx(predict_2006, "DailyPeakHour Prediction 2006.xlsx")
+
+####### MAPE of train	test
+#theta	18.36006	16.52716
+#HoltWinters_additive_model	18.31141	16.57884
+#HoltWinters_multiplicative_model	18.32123	16.62039
+#stl_model	15.94201	16.69605
+#decom_arima_model	17.5158	16.88061
+#decom_naive_model	23.28754	16.91098
+#decom_rwdrift_model	23.28947	17.09439
+#naive_model	24.92822	17.47012
+#regression_model	25.05647	18.16126
+#arima_model	30.01913	20.03753
+#tbats_model	22.49907	20.39525
+#HoltWinters_expo_model	23.40537	20.62065

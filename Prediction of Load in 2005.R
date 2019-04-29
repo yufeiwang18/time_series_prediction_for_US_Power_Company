@@ -314,18 +314,6 @@ autoplot(theta_f) + autolayer(theta_f$fitted,series="Fitted values")+
 mape_result
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 # decom_arima_model is the best
 ## predict for 2005 and save to "Load Prediction 2005.xlsx"
 ntest2005=8760
@@ -342,6 +330,19 @@ predict_2005=select(DailyPeakHour,Date, Hour,Load_kW)
 write.xlsx(predict_2005, "Load Prediction 2005.xlsx",sheetName="Prediction")
 
 
-
-
+####### MAPE of train	test
+#theta	2.14995	15.40401
+#HoltWinters_additive_model	2.501263	18.033887
+#HoltWinters_multiplicative_model	2.344205	18.287523
+#stl_model	0.986172	16.324152
+#decom_arima_model	1.206612	15.193803
+#decom_naive_model	2.151739	15.202198
+#decom_rwdrift_model	2.151706	15.51823
+#naive_model	17.7283	16.38052
+#regression_model	20.70072	22.42678
+#arima_model	3.120637	27.010644
+#tbats_model	2.482346	25.36399
+#HoltWinters_expo_model	7.078471	29.019098
+#ets_model	3.836214	36.59917
+#arima_fourier_model	4.682404	17.13954
 
